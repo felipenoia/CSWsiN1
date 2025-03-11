@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aula - 05</title>
+</head>
+<body>
+<h1>Principais Formatações</h1>
+<p></p> <h2>Negrito / Destaque</h2>
+<p>Na frase temos uma <b>parte do texto em negrito</b> usando a tag B (não semântica)</p>
+<p>Na frase temos uma <strong>parte do texto em negrito</strong> usando a tag strong (com semântica)</p>
+<P></P> <H2>Itálico / Ênfase </H2>
+<p>Nesta frase vamos entrar com uma palavra em <i>itálico</i> usando a tag i (não semântica)</p>
+<p>Nesta frase vamos entrar com uma palavra em <em>itálico</em> usando a tag EM (com semantica)</p>
+<p></p> <h2>Texto Marcador</h2>
+<p> Aqui vamos usar um texto com destaque <mark style="background-color: green"> de marcador de texto</mark> usando mark </p>
+<p> Aqui vamos usar um texto com destaque <mark style="background-color: yellow"> de marcador de texto</mark> usando mark </p>
+<p></p> <h2>Texto grande e pequeno</h2>
+<p> Estamos trabalhando aqui com um <big> texto grande</big> e um <small> texto pequeno </small> nesta frase</p>
+<p></p> <h2>Texto deletado</h2>
+<p> Neste paragrafo vamos trabalhar com um texto <del> que foi excluido</del> da frase</p>
+<p></p> <h2>Texto inserido</h2>
+<P>Nesta frase vamso demonstrar como <ins>destacar um texto inserido</ins> na frase de forma semântica</P>
+<p> Nesta frase vamso demonstrar como <u>destacar um texto inserido</u> na frase de forma semântica</p>
+<p></p> <h2>Texto sobrescrito </h2>
+<p> Vamos demonstrar uma formula da equação do segundo grau <sup>ax² + bx + c = 0</sup> usando tag sup</p>
+<p></p> <h2>Texto Subescrito</h2>
+<p>Vamos demonstrar o texto Subescrito com a fomula da agua <sub>H₂O</sub></p>
+<p></p> <h2>Trecho de código fonte</h2>
+<p> Neste exemplo vou demonstrar um trecho de código</p>
+<p> inserindo o comando document.getElementById('edtCodigo') que é um comando java script</p>
+<p>Inserindo um longo código de Phyton</p>
+<pre>
+    <code>
+        import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Função para gerar dados simulados com alguns outliers
+def gerar_dados_com_outliers():
+    # Gerando 1000 dados normalmente distribuídos
+    np.random.seed(0)
+    dados_normais = np.random.normal(loc=50, scale=15, size=1000)  # Média 50, Desvio padrão 15
+
+    # Adicionando outliers
+    outliers = [150, 160, 170, 180, 200]  # Alguns valores significativamente distantes
+    dados_com_outliers = np.append(dados_normais, outliers)  # Concatenando os outliers aos dados normais
+    
+    return dados_com_outliers
+
+# Função para visualizar os histogramas
+def visualizar_histograma(dados, titulo):
+    plt.figure(figsize=(10, 6))
+    plt.hist(dados, bins=30, edgecolor="black")
+    plt.title(titulo)
+    plt.xlabel("Valor")
+    plt.ylabel("Frequência")
+    plt.show()
+
+# Função para detectar outliers com base no método do Intervalo Interquartil (IQR)
+def remover_outliers_iqr(df):
+    Q1 = df["valor"].quantile(0.25)  # Primeiro quartil
+    Q3 = df["valor"].quantile(0.75)  # Terceiro quartil
+    IQR = Q3 - Q1  # Intervalo Interquartil
+
+    # Definindo limites inferior e superior para outliers
+    limite_inferior = Q1 - 1.5 * IQR
+    limite_superior = Q3 + 1.5 * IQR
+    
+    # Filtrando os dados para remover os outliers
+    df_sem_outliers = df[(df["valor"] >= limite_inferior) & (df["valor"] <= limite_superior)]
+    return df_sem_outliers
+
+# Função para detectar outliers com base no desvio padrão
+def remover_outliers_desvio_padrao(df):
+    media = df["valor"].mean()  # Média dos dados
+    desvio_padrao = df["valor"].std()  # Desvio padrão dos dados
+
+    # Definindo limites superior e inferior com base em 3 desvios padrão
+    limite_inferior = media - 3 * desvio_padrao
+    limite_superior = media + 3 * desvio_padrao
+
+    # Filtrando os dados para remover os outliers
+    df_sem_outliers = df[(df["valor"] >= limite_inferior) & (df["valor"] <= limite_superior)]
+    return df_sem_outliers
+
+# Função para gerar um DataFrame a partir dos dados
+def criar_dataframe(dados):
+    df = pd.DataFrame(dados, columns=["valor"])
+    return df
+
+# Função para calcular e exibir métricas antes e depois da remoção dos outliers
+def exibir_metricas(df_original, df_sem_outliers_iqr, df_sem_outliers_dp):
+    print("Métricas dos Dados Originais:")
+    print(df_original.describe())
+    
+    print("\nMétricas após remoção de outliers com IQR:")
+    print(df_sem_outliers_iqr.describe())
+    
+    print("\nMétricas após remoção de outliers com Desvio Padrão:")
+    print(df_sem_outliers_dp.describe())
+
+    # Exibindo quantos dados foram removidos
+    print(f"\nQuantidade de dados removidos (IQR): {len(df_original) - len(df_sem_outliers_iqr)}")
+    print(f"Quantidade de dados removidos (Desvio Padrão): {len(df_original) - len(df_sem_outliers_dp)}")
+
+# Função principal
+def main():
+    # Gerando dados com outliers
+    dados_com_outliers = gerar_dados_com_outliers()
+
+    # Criando DataFrame
+    df = criar_dataframe(dados_com_outliers)
+    
+    # Visualizando os dados originais com outliers
+    visualizar_histograma(df["valor"], "Histograma com Outliers")
+    
+    # Remover outliers utilizando IQR
+    df_sem_outliers_iqr = remover_outliers_iqr(df)
+    
+    # Visualizando os dados sem outliers (IQR)
+    visualizar_histograma(df_sem_outliers_iqr["valor"], "Histograma sem Outliers (Método IQR)")
+    
+    # Remover outliers utilizando Desvio Padrão
+    df_sem_outliers_dp = remover_outliers_desvio_padrao(df)
+    
+    # Visualizando os dados sem outliers (Desvio Padrão)
+    visualizar_histograma(df_sem_outliers_dp["valor"], "Histograma sem Outliers (Método Desvio Padrão)")
+    
+    # Exibindo métricas e quantidade de dados removidos
+    exibir_metricas(df, df_sem_outliers_iqr, df_sem_outliers_dp)
+
+# Executando o programa principal
+if __name__ == "__main__":
+    main()
+<p></p> <h2> Citações (quotation) simples</h2>
+<p>Segundo Steve Jobs <q>A tecnologia move o mundo</q> </p>
+<p></p> <h2>Citações completas (livros)</h2>
+<P>Segundo Sandra Kussunoki no seu livro A dança e o ventre:
+    <p></p> <brockquote>Dados existentes sobre intervenções cirúgicas nos corpos contemporâneos visando à obtenção de um <br> corpo mais proximo do padrão extético tais como lipospiração, próteses de silico, entre outras, <br> comprovam essa bsuca obssesiva pelo ideial de perfeição, que é baseado principalmente na magreza.  </brockquote>
+</P>
+<p></p><h2>Abreviações</h2>
+<p>Estamos estudando <aabr>HTML e CSS</aabr> </p>
+
+    </code>
+</pre>
+</body>
+</html>
